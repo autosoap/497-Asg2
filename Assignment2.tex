@@ -1,0 +1,33 @@
+\documentclass{article}
+
+\usepackage{Sweave}
+\begin{document}
+\input{Assignment2-concordance}
+
+\title { Graphing with ggplot2 using Tax Rates} 
+\author { Paul Wagner  
+\\ School of Information Technology 
+\\ Illinois State University
+\\
+\texttt{pgwagne@ilstu.edu}}
+\date{\today} 
+\maketitle
+
+
+
+\section{Reading in the data}
+
+
+\begin{Schunk}
+\begin{Sinput}
+> library(ggplot2)
+> library(RCurl)
+> x <- getURL("https://www.quandl.com/api/v1/datasets/TPC/HIST_FED_TAX_IND_ITR.csv")
+> taxdata <- read.csv(text = x)
+> ggplot(taxdata, aes(x=Year, y=Lowest.Quintile, fill=Year)) + 
++     geom_line(colour="red", linetype="dotted", size=1.5) + 
++     geom_point(colour="red", size=4, shape=21, fill="white")
+\end{Sinput}
+\end{Schunk}
+
+\end{document}

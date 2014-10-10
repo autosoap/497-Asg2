@@ -19,13 +19,24 @@
 
 <<>>=
 library(ggplot2)
+library(reshape)
 library(RCurl)
 x <- getURL("https://www.quandl.com/api/v1/datasets/TPC/HIST_FED_TAX_IND_ITR.csv")
 taxdata <- read.csv(text = x)
-@
 
-<<>>=
-library(ggplot2)
+taxdata = taxdata.frame(Lowest.Quintile, All.Quintiles,Top.1..)
+taxdata
+
+plot(extra ~ Year, 
+  taxdata = taxdata, 
+  type = "l", 
+  ylim = c(min(data[ ,-1]), max(data[ ,-1])),
+  ylab = "value")
+
+lines(taxdata$Year, taxdata$Lowest.Quintile, col = "red")
+lines(taxdata$Year, taxdata$All.Quintiles, col = "blue")
+lines(taxdata$Year, taxdata$Top.1.., col = "red")
+
 ggplot(taxdata, aes(x=Year, y=Lowest.Quintile, fill=Year)) + 
     geom_line(colour="red", linetype="dotted", size=1.5) + 
     geom_point(colour="red", size=4, shape=21, fill="white")
