@@ -1,9 +1,9 @@
 \documentclass{article}
 
-\begin{document}
-\SweaveOpts{concordance=TRUE}
 
-\title { Graphing with ggplot2 using Tax Rates} 
+\begin{document}
+
+\title {Change in Historical Average Federal Tax Rates for All Households} 
 \author { Paul Wagner  
 \\ School of Information Technology 
 \\ Illinois State University
@@ -12,34 +12,79 @@
 \date{\today} 
 \maketitle
 
+The average federal tax rate is calculated by federal tax liabilities divided by pre-tax income of a household. This tax rate has been divided into five categories by the CBO to illustrate tax burden on various income levels. These statistics illustrate the change from 1970 of three of the five tax brackets. The Lowest Quintile, Top Quintile and all Quintiles combined. 
 
+\section{Obtaining the data}
 
-\section{Reading in the data}
-
-
-<<>>=
+<<echo=FALSE, message=FALSE>>=
+library(knitr)
 library(ggplot2)
-library(reshape)
+library(reshape2)
 library(RCurl)
+@
+
+<<tidy=TRUE>>=
 x <- getURL("https://www.quandl.com/api/v1/datasets/TPC/HIST_FED_TAX_IND_ITR.csv")
 taxdata <- read.csv(text = x)
 
-taxdata = taxdata.frame(Lowest.Quintile, All.Quintiles,Top.1..)
-taxdata
-
-plot(extra ~ Year, 
-  taxdata = taxdata, 
-  type = "l", 
-  ylim = c(min(data[ ,-1]), max(data[ ,-1])),
-  ylab = "value")
-
-lines(taxdata$Year, taxdata$Lowest.Quintile, col = "red")
-lines(taxdata$Year, taxdata$All.Quintiles, col = "blue")
-lines(taxdata$Year, taxdata$Top.1.., col = "red")
-
-ggplot(taxdata, aes(x=Year, y=Lowest.Quintile, fill=Year)) + 
-    geom_line(colour="red", linetype="dotted", size=1.5) + 
-    geom_point(colour="red", size=4, shape=21, fill="white")
 @
+
+\section{Data}
+
+\subsection{Data Description}
+
+The data includes three columns of numbers. These values are based off of a percentage of change or difference starting from 1979 the Lowest Quintile, 0, all quintiles, 4 and the top 1\%, 7.4. The data does not represent the actual tax rate paid by each quintile. Representation of this data may be confusing as the graph is only showing a change of tax rates and not an actual tax rate. To illustrate the data better, in 2010: the lowest quintile paid 1.5\% federal tax rate while the top 1\% paid a federal tax rate of 29.4\%.
+
+The allowable value of the first column is a date - a 4 digit year, followed by a 2 digit month and a 2 digit day. The allowable values for columns 2, 3 and 4 are positive or negative numbers with a single digit after the decimal point.
+
+\subsection{Data Exploration}
+<<echo=FALSE>>=
+
+options(width=60)
+colnames(taxdata) <-c("Year", "Lowest.Quintile", "All.Quintiles", "Top.1..")
+
+taxdata.new <- subset(taxdata, select=c("Year", "Lowest.Quintile", "All.Quintiles", "Top.1.."))
+
+@
+
+<<tidy=TRUE>>=
+class(taxdata.new)
+str(taxdata.new, width = 60, strict.width = "wrap")
+summary(taxdata.new)
+@
+
+\section{Results}
+
+\begin{table}
+
+<<tidy=TRUE, highlight=FALSE>>=
+taxdata.new
+@
+\caption{Change in Federal Tax Rates}
+\label{table:table1}
+\end{table}
+
+Income quintiles are calculated by ranking households by income and adjusting for the number of members of the household by dividing by the square root of the household’s size. All quintiles contain the same number of people. Households who have negative income in a year are excluded from the lowest quintile but included in totals.
+
+\section{Plotting the data}
+
+\begin{table}
+<<echo=FALSE>>=
+taxdataMelt <-melt(taxdata.new, id.vars="Year")
+
+ggplot(taxdataMelt, aes(as.Date(Year,
+  format = "%Y-%m-%d"),value)) + geom_line(aes(color = variable))
+
+@
+\caption{Change in Lowest Quintile, All Quintiles, Top 1\% Rates}
+\label{table:graph1}
+\end{table}
+
+\subsection{Data Conclusions}
+
+Taxes were raised on the wealthy in 1993 by adding two new tax brackets on the top which manifests itself as a less dramatic drop to the top 1\% rate as compared to the overall and lowest brackets over the same time period. Taxes were cut in 2001 through 2003, which lowered overall taxes which is shown in the data. The crash and beginning of the recession is illustrated in table \ref{table:graph1} on page \pageref{table:graph1} by the dramatic overall drop from 2008 to 2010.
+
+Since the data in table \ref{table:table1} on page \pageref{table:table1} shows taxes earned, which directly correlates to income earned, these numbers give a good indication of overall economic health as much as they do about large changes to tax policy in the United States. Adjusted for inflation, income for the middle quintile down have remained generally flat since 1970 whereas higher income earners in the top quintile and top 1\% have seen their incomes rise 30-40\%. Lower income earners were hurt much more by the recession as compared to the top 1\% of earners.
+
 
 \end{document}
